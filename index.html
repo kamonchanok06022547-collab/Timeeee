@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin HWID Manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>body { background: #f8f9fa; padding: 20px; }</style>
+</head>
+<body>
+    <div class="container bg-white p-4 shadow-sm rounded" style="max-width: 500px;">
+        <h3 class="text-primary mb-4">Admin Dashboard</h3>
+        <div class="mb-3">
+            <label class="form-label">ชื่อเล่นลูกค้า</label>
+            <input type="text" id="name" class="form-control" placeholder="เช่น นาย A">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">HWID (รหัสเครื่อง)</label>
+            <input type="text" id="hwid" class="form-control" placeholder="วางรหัสเครื่องที่นี่">
+        </div>
+        <button onclick="saveToGithub()" class="btn btn-success w-100 py-2">✅ อนุมัติและเปิดสิทธิ์</button>
+        <hr>
+        <div id="status" class="small text-center mt-2"></div>
+    </div>
+
+    <script>
+        async function saveToGithub() {
+            const name = document.getElementById('name').value;
+            const hwid = document.getElementById('hwid').value;
+            const status = document.getElementById('status');
+            
+            // --- ตั้งค่าข้อมูล GitHub ของคุณตรงนี้ ---
+            const token = "ใส่_TOKEN_ของคุณที่นี่"; 
+            const repo = "ชื่อUSER/ชื่อREPO";
+            const path = "database.json";
+
+            if(!name || !hwid) return alert("กรุณากรอกข้อมูลให้ครบ");
+            status.innerText = "กำลังเชื่อมต่อกับ GitHub...";
+
+            try {
+                // 1. ดึงข้อมูลเดิมมาดู
+                const res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+                    headers: { Authorization: `token ${token}` }
+                });
+                const data = await res.json();
+                let list = JSON.parse(atob(data.content));
+
+                // 2. เพิ่มข้อมูลใหม่
+                list.push({ name: name, hwid: hwid, date: new Date().toLocaleDateString() });
+
+                // 3. ส่งกลับไปบันทึก
+                const update = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+                    method: "PUT",
+                    headers: { Authorization: `token ${token}` },
+                    body: JSON.stringify({
+                        message: `Add user: ${name}`,
+                        content: btoa(JSON.stringify(list, null, 2)),
+                        sha: data.sha
+                    })
+                });
+
+                if(update.ok) {
+                    status.innerText = "✅ อนุมัติสิทธิ์เรียบร้อย!";
+                    document.getElementById('name').value = "";
+                    document.getElementById('hwid').value = "";
+                }
+            } catch (err) { status.innerText = "❌ เกิดข้อผิดพลาด: " + err; }
+        }
+    </script>
+</body>
+</html>
