@@ -1,70 +1,126 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
-    <title>Admin HWID Manager</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>body { background: #f8f9fa; padding: 20px; }</style>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            background-color: #2c3e50;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        /* แผงควบคุม */
+        .admin-panel {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            margin-bottom: 40px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        input[type="color"] {
+            height: 38px;
+            width: 100%;
+            padding: 2px;
+            cursor: pointer;
+        }
+
+        /* ส่วนแสดงผลที่ต้องแคปรูป */
+        .preview-label {
+            color: white;
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .taskbar-box {
+            background-color: #0f0f0f; /* สีเริ่มต้น */
+            color: #ffffff;
+            padding: 4px 10px;
+            text-align: right;
+            width: fit-content;
+            border-radius: 2px;
+            transition: background 0.2s;
+        }
+
+        .time-text {
+            font-size: 12px;
+            line-height: 1.2;
+            display: block;
+            font-weight: 400;
+        }
+
+        .date-text {
+            font-size: 12px;
+            line-height: 1.2;
+            display: block;
+        }
+    </style>
 </head>
 <body>
-    <div class="container bg-white p-4 shadow-sm rounded" style="max-width: 500px;">
-        <h3 class="text-primary mb-4">Admin Dashboard</h3>
-        <div class="mb-3">
-            <label class="form-label">ชื่อเล่นลูกค้า</label>
-            <input type="text" id="name" class="form-control" placeholder="เช่น นาย A">
+
+    <div class="admin-panel">
+        <div class="control-group">
+            <label>เวลา (HH:mm)</label>
+            <input type="text" id="timeIn" value="10:29" oninput="render()">
         </div>
-        <div class="mb-3">
-            <label class="form-label">HWID (รหัสเครื่อง)</label>
-            <input type="text" id="hwid" class="form-control" placeholder="วางรหัสเครื่องที่นี่">
+        <div class="control-group">
+            <label>วันที่ (D/M/YYYY)</label>
+            <input type="text" id="dateIn" value="26/2/2569" oninput="render()">
         </div>
-        <button onclick="saveToGithub()" class="btn btn-success w-100 py-2">✅ อนุมัติและเปิดสิทธิ์</button>
-        <hr>
-        <div id="status" class="small text-center mt-2"></div>
+        <div class="control-group">
+            <label>สีพื้นหลัง</label>
+            <input type="color" id="colorIn" value="#0f0f0f" oninput="render()">
+        </div>
+    </div>
+
+    <div class="preview-label">ผลลัพธ์สำหรับแคปรูป:</div>
+    
+    <div class="taskbar-box" id="displayBox">
+        <span class="time-text" id="outTime">10:29</span>
+        <span class="date-text" id="outDate">26/2/2569</span>
     </div>
 
     <script>
-        async function saveToGithub() {
-            const name = document.getElementById('name').value;
-            const hwid = document.getElementById('hwid').value;
-            const status = document.getElementById('status');
-            
-            // --- ตั้งค่าข้อมูล GitHub ของคุณตรงนี้ ---
-            const token = "ใส่_TOKEN_ของคุณที่นี่"; 
-            const repo = "ชื่อUSER/ชื่อREPO";
-            const path = "database.json";
+        function render() {
+            // ดึงค่าจากช่องกรอก
+            const time = document.getElementById('timeIn').value;
+            const date = document.getElementById('dateIn').value;
+            const bgColor = document.getElementById('colorIn').value;
 
-            if(!name || !hwid) return alert("กรุณากรอกข้อมูลให้ครบ");
-            status.innerText = "กำลังเชื่อมต่อกับ GitHub...";
-
-            try {
-                // 1. ดึงข้อมูลเดิมมาดู
-                const res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
-                    headers: { Authorization: `token ${token}` }
-                });
-                const data = await res.json();
-                let list = JSON.parse(atob(data.content));
-
-                // 2. เพิ่มข้อมูลใหม่
-                list.push({ name: name, hwid: hwid, date: new Date().toLocaleDateString() });
-
-                // 3. ส่งกลับไปบันทึก
-                const update = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
-                    method: "PUT",
-                    headers: { Authorization: `token ${token}` },
-                    body: JSON.stringify({
-                        message: `Add user: ${name}`,
-                        content: btoa(JSON.stringify(list, null, 2)),
-                        sha: data.sha
-                    })
-                });
-
-                if(update.ok) {
-                    status.innerText = "✅ อนุมัติสิทธิ์เรียบร้อย!";
-                    document.getElementById('name').value = "";
-                    document.getElementById('hwid').value = "";
-                }
-            } catch (err) { status.innerText = "❌ เกิดข้อผิดพลาด: " + err; }
+            // แสดงผลในกล่องดำ
+            document.getElementById('outTime').innerText = time;
+            document.getElementById('outDate').innerText = date;
+            document.getElementById('displayBox').style.backgroundColor = bgColor;
         }
     </script>
+
 </body>
 </html>
