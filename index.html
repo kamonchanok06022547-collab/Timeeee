@@ -7,159 +7,131 @@
         :root {
             --bg-pastel: linear-gradient(135deg, #E1F5FE 0%, #B3E5FC 100%);
             --pastel-blue-btn: #81D4FA;
-            --text-dark: #546E7A;
         }
 
         body { 
             background: var(--bg-pastel);
             font-family: 'Segoe UI', Tahoma, sans-serif; 
             display: flex; flex-direction: column; align-items: center; 
-            min-height: 100vh; margin: 0; padding: 50px;
+            min-height: 100vh; margin: 0; padding: 20px;
         }
 
-        /* หน้าต่างควบคุม */
         .main-container {
             background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(15px);
-            padding: 45px; border-radius: 40px;
-            width: 600px; box-shadow: 0 20px 45px rgba(0,0,0,0.05);
-            border: 3px solid #E1F5FE; 
-            display: grid; grid-template-columns: 1fr 1fr; gap: 25px;
-            position: relative; /* เพื่อวางชื่อจูสุดหล่อ */
+            padding: 30px; border-radius: 30px;
+            width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column; gap: 15px;
         }
 
-        h1 { grid-column: span 2; text-align: center; color: #0288D1; font-size: 32px; margin: 0; }
+        h1 { text-align: center; color: #0288D1; font-size: 24px; margin: 0; }
 
         .input-group { display: flex; flex-direction: column; }
-        label { font-size: 14px; font-weight: bold; color: #78909C; margin-bottom: 8px; }
+        label { font-size: 12px; font-weight: bold; color: #78909C; margin-bottom: 5px; }
         
-        input, select { 
-            padding: 15px; border: 2px solid #E1F5FE; border-radius: 20px; 
-            background: #fff; font-size: 16px; outline: none;
-        }
-
-        /* เปลี่ยนข้อความปุ่มตามสั่ง */
+        input, select { padding: 8px; border: 2px solid #E1F5FE; border-radius: 10px; outline: none; }
+        
         button { 
-            grid-column: span 2; padding: 20px; border: none; border-radius: 25px;
-            background: linear-gradient(45deg, var(--pastel-blue-btn), #B3E5FC); color: white;
-            font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s;
-            margin-top: 15px; box-shadow: 0 10px 20px rgba(129, 212, 250, 0.3);
+            padding: 15px; border: none; border-radius: 20px;
+            background: linear-gradient(45deg, #81D4FA, #B3E5FC); color: white;
+            font-weight: bold; cursor: pointer; margin-top: 10px;
         }
-        button:hover { transform: translateY(-3px); filter: brightness(1.05); }
-
-        /* ชื่อจูสุดหล่อ ตัวเล็กๆๆๆ ขวาล่าง */
-        .credit {
-            position: absolute;
-            bottom: 15px;
-            right: 25px;
-            font-size: 9px;
-            color: #B0BEC5;
-            letter-spacing: 0.5px;
-        }
-
-        /* --- ส่วนก๊อปปี้นาฬิกา --- */
-        .preview-wrapper { margin-top: 60px; padding: 0; background: transparent; }
 
         #captureArea { 
             display: inline-flex; align-items: center; 
-            padding: 4px 10px; 
-            background-color: #0f0f0f; 
-            color: white; gap: 6px;
-            border: 0 !important; outline: 0 !important; margin: 0 !important;
-            box-sizing: border-box;
-            border-radius: 0 !important;
+            padding: 5px 15px; background-color: #0f0f0f; color: white; gap: 8px;
+            border-radius: 5px; margin-top: 20px;
         }
-
-        .text-stack { text-align: right; line-height: 1.1; pointer-events: none; }
-        .t-font { font-size: 13px; display: block; }
-        .d-font { font-size: 12px; display: block; }
-        #bellIcon { display: none; width: 18px; height: 18px; fill: white; }
+        .text-stack { text-align: right; line-height: 1.1; }
     </style>
 </head>
 <body>
 
     <div class="main-container">
-        <h1>🚦 Time Time Time 🚦</h1>
+        <h1>ปรับแต่งเวลา</h1>
         
         <div class="input-group">
-            <label>🕒 เวลา</label>
-            <input type="text" id="inT" value="11:23" oninput="update()">
+            <label>🕒 เวลา / 📅 วันที่</label>
+            <div style="display:flex; gap:5px;">
+                <input type="text" id="inT" oninput="update()" style="flex:1;">
+                <input type="text" id="inD" oninput="update()" style="flex:1;">
+            </div>
         </div>
         
         <div class="input-group">
-            <label>📅 วันที่</label>
-            <input type="text" id="inD" value="26/2/2569" oninput="update()">
+            <label>🎨 สีพื้นหลัง / สีตัวอักษร</label>
+            <div style="display:flex; gap:5px;">
+                <input type="color" id="inC" value="#0f0f0f" oninput="update()" style="flex:1; height:35px;">
+                <input type="color" id="inTC" value="#ffffff" oninput="update()" style="flex:1; height:35px;">
+            </div>
         </div>
-        
-        <div class="input-group">
-            <label>🎨 สีพื้นหลัง</label>
-            <input type="color" id="inC" value="#0f0f0f" oninput="update()" style="height:55px; padding:5px; cursor:pointer;">
-        </div>
-        
+
         <div class="input-group">
             <label>🔔 กระดิ่ง</label>
             <select id="inL" onchange="update()">
                 <option value="none">ปิด</option>
-                <option value="flex">เปิด (ขวา)</option>
+                <option value="flex">เปิด</option>
             </select>
         </div>
-        
-        <button onclick="copyToClipboard()">🌀 ก๊อปปี้เลยครับสุดสวย 🌀</button>
 
-        <div class="credit">จูสุดหล่อ</div>
+        <div class="input-group">
+            <label>↔️ ปรับขนาดกรอบ (Padding)</label>
+            <input type="range" id="inP" min="0" max="30" value="5" oninput="update()">
+        </div>
+
+        <div class="input-group">
+            <label>📏 ปรับขนาดตัวอักษร</label>
+            <input type="range" id="inS" min="8" max="30" value="13" oninput="update()">
+        </div>
+        
+        <button onclick="copyToClipboard()">ก๊อปปี้เลยครับสุดสวย</button>
     </div>
 
-    <div class="preview-wrapper">
-        <div id="captureArea">
-            <div class="text-stack">
-                <span class="t-font" id="outT">11:23</span>
-                <span class="d-font" id="outD">26/2/2569</span>
-            </div>
-            <svg id="bellIcon" viewBox="0 0 24 24">
-                <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
-            </svg>
+    <div id="captureArea">
+        <div class="text-stack" id="textContainer">
+            <span id="outT" style="display:block;"></span>
+            <span id="outD" style="display:block;"></span>
         </div>
+        <svg id="bellIcon" viewBox="0 0 24 24" style="width:18px; fill:white; display:none;">
+            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+        </svg>
     </div>
 
     <script>
         function update() {
-            document.getElementById('outT').innerText = document.getElementById('inT').value;
-            document.getElementById('outD').innerText = document.getElementById('inD').value;
-            document.getElementById('captureArea').style.backgroundColor = document.getElementById('inC').value;
-            document.getElementById('bellIcon').style.display = document.getElementById('inL').value;
+            const area = document.getElementById('captureArea');
+            const outT = document.getElementById('outT');
+            const outD = document.getElementById('outD');
+            const bell = document.getElementById('bellIcon');
+            
+            outT.innerText = document.getElementById('inT').value;
+            outD.innerText = document.getElementById('inD').value;
+            
+            area.style.backgroundColor = document.getElementById('inC').value;
+            area.style.padding = document.getElementById('inP').value + 'px 15px';
+            
+            outT.style.color = document.getElementById('inTC').value;
+            outD.style.color = document.getElementById('inTC').value;
+            bell.style.fill = document.getElementById('inTC').value;
+            bell.style.display = document.getElementById('inL').value;
+            
+            outT.style.fontSize = document.getElementById('inS').value + 'px';
+            outD.style.fontSize = (document.getElementById('inS').value - 1) + 'px';
         }
 
         async function copyToClipboard() {
             const area = document.getElementById('captureArea');
-            
-            // Render และตัดขอบทิ้ง 2 พิกเซล เพื่อกันขอบสีเขียว/ขาว
-            const tempCanvas = await html2canvas(area, { 
-                backgroundColor: null, 
-                scale: 3, 
-                logging: false,
-                width: area.offsetWidth,
-                height: area.offsetHeight
+            const canvas = await html2canvas(area, { backgroundColor: null, scale: 3 });
+            canvas.toBlob(blob => {
+                navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+                alert("ก๊อปปี้เรียบร้อย!");
             });
-
-            const finalCanvas = document.createElement('canvas');
-            const ctx = finalCanvas.getContext('2d');
-            const cropAmount = 2; 
-            
-            finalCanvas.width = (tempCanvas.width) - (cropAmount * 2);
-            finalCanvas.height = (tempCanvas.height) - (cropAmount * 2);
-
-            ctx.drawImage(tempCanvas, 
-                cropAmount, cropAmount, finalCanvas.width, finalCanvas.height, 
-                0, 0, finalCanvas.width, finalCanvas.height
-            );
-
-            finalCanvas.toBlob(blob => {
-                const item = new ClipboardItem({ "image/png": blob });
-                navigator.clipboard.write([item]).then(() => {
-                    alert("ก๊อปปี้ให้แล้วจ้าสุดสวย! 🚦");
-                });
-            }, "image/png");
         }
+
+        // Init
+        const now = new Date();
+        document.getElementById('inT').value = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+        document.getElementById('inD').value = now.getDate() + "/" + (now.getMonth() + 1) + "/" + (now.getFullYear() + 543);
+        update();
     </script>
 </body>
 </html>
